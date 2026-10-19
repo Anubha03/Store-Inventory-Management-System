@@ -35,7 +35,3 @@ Open http://127.0.0.1:8111 and sign in with an employee account from your databa
 - `templates/`: HTML views for login, inventory operations, search, and history.
 - `requirements.txt`: runtime dependencies.
 - `.env.example`: example database connection configuration.
-
-## Project origin
-
-Course project source imported from [Sans-Shej/StoreInventoryProj](https://github.com/Sans-Shej/StoreInventoryProj). This standalone repository adds documentation and environment-based database configuration, and excludes the bundled virtual environment and machine-specific files.
