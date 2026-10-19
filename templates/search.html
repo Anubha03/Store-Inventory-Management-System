@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Products</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #FF9800;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #a1a1a1;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-btn:hover {
+            background-color: #555;
+        }
+        .filters {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .filter-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .search-btn {
+            background-color: #FF9800;
+            color: white;
+        }
+        .search-btn:hover {
+            background-color: #e68900;
+        }
+        .clear-btn {
+            background-color: #666;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #FF9800;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .low-stock {
+            background-color: #ffebee;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .result-count {
+            margin: 20px 0;
+            color: #666;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/home" class="back-btn">← Back to Home</a>
+        
+        <h1>Search Products</h1>
+        
+        <form method="GET" action="/search">
+            <div class="filters">
+                <h3>Filter Options</h3>
+                <div class="filter-row">
+                    <div class="form-group">
+                        <label for="product_name">Product Name:</label>
+                        <input type="text" id="product_name" name="product_name" 
+                               value="{{ filters.get('product_name', '') }}"
+                               placeholder="Search by name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category_id">Category:</label>
+                        <select id="category_id" name="category_id">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                                <option value="{{ category[0] }}" 
+                                        {% if filters.get('category_id') == category[0]|string %}selected{% endif %}>
+                                    {{ category[1] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shelf_id">Shelf Location:</label>
+                        <select id="shelf_id" name="shelf_id">
+                            <option value="">All Locations</option>
+                            {% for shelf in shelves %}
+                                <option value="{{ shelf[0] }}" 
+                                        {% if filters.get('shelf_id') == shelf[0]|string %}selected{% endif %}>
+                                    {{ shelf[1] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="threshold">Low Stock Threshold:</label>
+                        <input type="number" id="threshold" name="threshold" min="0"
+                               value="{{ filters.get('threshold', '') }}"
+                               placeholder="e.g., 30">
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button type="submit" class="search-btn">Search</button>
+                    <button type="button" class="clear-btn" onclick="window.location.href='/search'">Clear Filters</button>
+                </div>
+            </div>
+        </form>
+        
+        {% if products %}
+        <div class="result-count">
+            Found {{ products|length }} product(s)
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Product ID</th>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Category</th>
+                    <th>Shelf ID</th>
+                    <th>Location</th>
+                    <th>Expiration</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product[0] }}</td>
+                    <td>{{ product[1] }}</td>
+                    <td>{{ product[2] }}</td>
+                    <td>{{ product[3] }}</td>
+                    <td>{{ product[4] }}</td>
+                    <td>{{ product[5] }}</td>
+                    <td>{{ product[6] if product[6] else 'N/A' }}</td>
+                    <td>${{ "%.2f"|format(product[7]) }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-results">
+            <p>No products found. Try adjusting your filters.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

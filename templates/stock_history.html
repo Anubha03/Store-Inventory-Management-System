@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #00BCD4;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #a1a1a1;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .back-btn:hover {
+            background-color: #555;
+        }
+        .filter-section {
+            background-color: #e0f7fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #00BCD4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #00acc1;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #00BCD4;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .no-history {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .positive {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .negative {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .reason {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            background-color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/home" class="back-btn">← Back to Home</a>
+        
+        <h1>Stock History</h1>
+        <p style="color: #666;">View all movements for a specific product</p>
+        
+        <form method="GET" action="/stock_history">
+            <div class="filter-section">
+                <div class="form-group">
+                    <label for="product_id">Select Product:</label>
+                    <select id="product_id" name="product_id" required>
+                        <option value="">Select Product</option>
+                        {% for product in products %}
+                            <option value="{{ product[0] }}" 
+                                    {% if selected_product == product[0]|string %}selected{% endif %}>
+                                {{ product[0] }} - {{ product[1] }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit">View History</button>
+            </div>
+        </form>
+        
+        {% if history %}
+        <h3>Movement History</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Movement ID</th>
+                    <th>Employee ID</th>
+                    <th>Employee Name</th>
+                    <th>Date & Time</th>
+                    <th>Quantity Change</th>
+                    <th>Reason</th>
+                    <th>Shelf Location</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in history %}
+                <tr>
+                    <td>{{ record[0] }}</td>
+                    <td>{{ record[1] }}</td>
+                    <td>{{ record[2] }}</td>
+                    <td>{{ record[3] }}</td>
+                    <td class="{% if record[4] > 0 %}positive{% else %}negative{% endif %}">
+                        {{ record[4] if record[4] > 0 else record[4] }}
+                    </td>
+                    <td><span class="reason">{{ record[5] }}</span></td>
+                    <td>{{ record[6] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% elif selected_product %}
+        <div class="no-history">
+            <p>No movement history found for this product.</p>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
